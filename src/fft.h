@@ -25,7 +25,8 @@ public:
 	enum
 	{
 		ID_MENU_OPENINPUT = wxID_HIGHEST + 1,
-		ID_MENU_SAVEOUTPUT
+		ID_MENU_SAVEOUTPUT,
+		ID_MENU_RUN
 	};
 	
 	wxTextCtrl* inputvars;

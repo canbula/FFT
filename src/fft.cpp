@@ -34,6 +34,9 @@ FFT::FFT(const wxString& title)
 	file->Append(wxID_ABOUT,wxT("About\tCtrl+H"));
 	file->Append(wxID_EXIT,wxT("Close"));
 	menubar->Append(file,wxT("File"));
+	wxMenu *action = new wxMenu;
+	action->Append(ID_MENU_RUN,wxT("Run\tCtrl+R"));
+	menubar->Append(action,wxT("Action"));
 	SetMenuBar(menubar);
 	
 	wxStatusBar *statusbar = new wxStatusBar(this,wxID_ANY,wxST_SIZEGRIP);
