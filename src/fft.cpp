@@ -118,6 +118,7 @@ FFT::FFT(const wxString& title)
 	Connect(wxID_ABOUT,wxEVT_COMMAND_MENU_SELECTED,wxCommandEventHandler(FFT::OnAbout));
 	Connect(wxID_EXIT,wxEVT_COMMAND_MENU_SELECTED,wxCommandEventHandler(FFT::OnQuit));
 	Connect(ID_MENU_OPENINPUT,wxEVT_COMMAND_MENU_SELECTED,wxCommandEventHandler(FFT::OpenFileForInputMenu));
+	Connect(ID_MENU_SAVEOUTPUT,wxEVT_COMMAND_MENU_SELECTED,wxCommandEventHandler(FFT::SaveOutputAsFileMenu));
 	
 	SetIcon(wxIcon(wxT("resource/fft.xpm")));
 	Centre();
@@ -144,5 +145,16 @@ void FFT::OpenFileForInput()
 	if(newfileforinput->ShowModal() == wxID_OK)
 	{
 		inputtc->LoadFile(newfileforinput->GetPath());
+	}
+}
+
+void FFT::SaveOutputAsFileMenu(wxCommandEvent& event) {FFT::SaveOutputAsFile();}
+
+void FFT::SaveOutputAsFile()
+{
+	wxFileDialog *filesaveas = new wxFileDialog(this,wxT("Save the output as text file.."),wxT(""),wxT("fft.out"),wxT("*.*"),wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
+	if(filesaveas->ShowModal() == wxID_OK)
+	{
+		outputtc->SaveFile(filesaveas->GetPath());
 	}
 }

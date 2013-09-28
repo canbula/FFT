@@ -38,5 +38,7 @@ public:
 	void OnAbout(wxCommandEvent& event);
 	void OpenFileForInputMenu(wxCommandEvent& event);
 	void OpenFileForInput();
+	void SaveOutputAsFileMenu(wxCommandEvent& event);
+	void SaveOutputAsFile();
 
 };
