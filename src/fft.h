@@ -24,15 +24,19 @@ public:
 	
 	enum
 	{
-		ID_FIRST = wxID_HIGHEST + 1,
-		ID_LAST
+		ID_MENU_OPENINPUT = wxID_HIGHEST + 1,
+		ID_MENU_SAVEOUTPUT
 	};
 	
 	wxTextCtrl* inputvars;
 	wxTextCtrl* outputvars;
 	wxTextCtrl* outputformat;
+	wxTextCtrl* inputtc;
+	wxTextCtrl* outputtc;
 
 	void OnQuit(wxCommandEvent& event);
 	void OnAbout(wxCommandEvent& event);
+	void OpenFileForInputMenu(wxCommandEvent& event);
+	void OpenFileForInput();
 
 };

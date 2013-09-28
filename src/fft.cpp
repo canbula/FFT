@@ -28,8 +28,8 @@ FFT::FFT(const wxString& title)
 	
 	wxMenuBar *menubar = new wxMenuBar;
 	wxMenu *file = new wxMenu;
-	file->Append(wxID_ANY,wxT("Open input file\tCtrl+O"));
-	file->Append(wxID_ANY,wxT("Save output file\tCtrl+S"));
+	file->Append(ID_MENU_OPENINPUT,wxT("Open input file\tCtrl+O"));
+	file->Append(ID_MENU_SAVEOUTPUT,wxT("Save output file\tCtrl+S"));
 	file->AppendSeparator();
 	file->Append(wxID_ABOUT,wxT("About\tCtrl+H"));
 	file->Append(wxID_EXIT,wxT("Close"));
@@ -85,10 +85,10 @@ FFT::FFT(const wxString& title)
 
 	wxPanel *leftpanel = new wxPanel(middlepanel,-1);
 	wxBoxSizer *leftvbox = new wxBoxSizer(wxVERTICAL);
-	wxTextCtrl *lefttextctrl = new wxTextCtrl(leftpanel,-1,wxT(""),wxPoint(-1,-1),wxSize(-1,-1),wxTE_MULTILINE);
-	lefttextctrl->SetFont(fixedfont);
-	lefttextctrl->SetValue(wxT(""));
-	leftvbox->Add(lefttextctrl,1,wxALIGN_CENTER|wxEXPAND);
+	inputtc = new wxTextCtrl(leftpanel,-1,wxT(""),wxPoint(-1,-1),wxSize(-1,-1),wxTE_MULTILINE);
+	inputtc->SetFont(fixedfont);
+	inputtc->SetValue(wxT(""));
+	leftvbox->Add(inputtc,1,wxALIGN_CENTER|wxEXPAND);
 	leftpanel->SetSizer(leftvbox);
 	middlehbox->Add(leftpanel,1,wxALIGN_LEFT|wxEXPAND);
 
@@ -97,10 +97,10 @@ FFT::FFT(const wxString& title)
 
 	wxPanel *rightpanel = new wxPanel(middlepanel,-1);
 	wxBoxSizer *rightvbox = new wxBoxSizer(wxVERTICAL);
-	wxTextCtrl *righttextctrl = new wxTextCtrl(rightpanel,-1,wxT(""),wxPoint(-1,-1),wxSize(-1,-1),wxTE_MULTILINE);
-	righttextctrl->SetFont(fixedfont);
-	righttextctrl->SetValue(wxT(""));
-	rightvbox->Add(righttextctrl,1,wxALIGN_CENTER|wxEXPAND);
+	outputtc = new wxTextCtrl(rightpanel,-1,wxT(""),wxPoint(-1,-1),wxSize(-1,-1),wxTE_MULTILINE);
+	outputtc->SetFont(fixedfont);
+	outputtc->SetValue(wxT(""));
+	rightvbox->Add(outputtc,1,wxALIGN_CENTER|wxEXPAND);
 	rightpanel->SetSizer(rightvbox);
 	middlehbox->Add(rightpanel,1,wxALIGN_RIGHT|wxEXPAND);
 
@@ -117,6 +117,7 @@ FFT::FFT(const wxString& title)
 	
 	Connect(wxID_ABOUT,wxEVT_COMMAND_MENU_SELECTED,wxCommandEventHandler(FFT::OnAbout));
 	Connect(wxID_EXIT,wxEVT_COMMAND_MENU_SELECTED,wxCommandEventHandler(FFT::OnQuit));
+	Connect(ID_MENU_OPENINPUT,wxEVT_COMMAND_MENU_SELECTED,wxCommandEventHandler(FFT::OpenFileForInputMenu));
 	
 	SetIcon(wxIcon(wxT("resource/fft.xpm")));
 	Centre();
@@ -134,3 +135,14 @@ void FFT::OnAbout(wxCommandEvent& WXUNUSED(event))
 }
 
 void FFT::OnQuit(wxCommandEvent& WXUNUSED(event)) {Close(true);}
+
+void FFT::OpenFileForInputMenu(wxCommandEvent& event) {FFT::OpenFileForInput();}
+
+void FFT::OpenFileForInput()
+{
+	wxFileDialog *newfileforinput = new wxFileDialog(this,wxT("Pick a text file for input.."));
+	if(newfileforinput->ShowModal() == wxID_OK)
+	{
+		inputtc->LoadFile(newfileforinput->GetPath());
+	}
+}
