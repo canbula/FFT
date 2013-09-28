@@ -309,13 +309,23 @@ void FFT::Run()
 	fftFortranFile.AddLine(wxT("program fft"));
 	fftFortranFile.AddLine(wxT("\timplicit none"));
 	fftFortranFile.AddLine(wxT("\tinteger inputrd"));
-	fftFortranFile.AddLine(wxT("\tcharacter(80) :: inputline"));
+	wxStringTokenizer inputvarstkz(inputvars->GetValue(),wxT(","));
+	wxString inputvarlist;
+	int i=0;
+	while(inputvarstkz.HasMoreTokens())
+	{
+		wxString variable = inputvarstkz.GetNextToken();
+		fftFortranFile.AddLine(wxT("\t")+variable.Mid(2,variable.Len()-3)+wxT(" :: ")+variable.Mid(0,1));
+		if(i>0) inputvarlist << wxT(",");
+		inputvarlist << variable.Mid(0,1);
+		i++;
+	}
 	fftFortranFile.AddLine(wxT("\topen(10,file=\"input\")"));
 	fftFortranFile.AddLine(wxT("\topen(20,file=\"output\")"));
 	fftFortranFile.AddLine(wxT("\tdo"));
-	fftFortranFile.AddLine(wxT("\t\tread(10,*,iostat=inputrd) inputline"));
+	fftFortranFile.AddLine(wxT("\t\tread(10,*,iostat=inputrd) ")+inputvarlist);
 	fftFortranFile.AddLine(wxT("\t\tif(inputrd.ne.0) exit"));
-	fftFortranFile.AddLine(wxT("\t\twrite(20,*) inputline"));
+	fftFortranFile.AddLine(wxT("\t\twrite(20,\"")+outputformat->GetValue()+wxT("\") ")+outputvars->GetValue());
 	fftFortranFile.AddLine(wxT("\tend do"));
 	fftFortranFile.AddLine(wxT("\tclose(20)"));
 	fftFortranFile.AddLine(wxT("\tclose(10)"));
