@@ -22,9 +22,43 @@ FFT::FFT(const wxString& title)
 {
 	
 	wxFont fixedfont(11, wxMODERN, wxNORMAL, wxNORMAL);
-
-	//wxImage::AddHandler(new wxPNGHandler);
-	//wxBitmap toolbarLibrary(srcLocation+wxT("resource/toolbar/add.png"),wxBITMAP_TYPE_PNG);
+	
+	variablenames = new wxArrayString();
+	variablenames->Add(wxT("a"));
+	variablenames->Add(wxT("b"));
+	variablenames->Add(wxT("c"));
+	variablenames->Add(wxT("d"));
+	variablenames->Add(wxT("e"));
+	variablenames->Add(wxT("f"));
+	variablenames->Add(wxT("g"));
+	variablenames->Add(wxT("h"));
+	variablenames->Add(wxT("i"));
+	variablenames->Add(wxT("j"));
+	variablenames->Add(wxT("k"));
+	variablenames->Add(wxT("l"));
+	variablenames->Add(wxT("m"));
+	variablenames->Add(wxT("n"));
+	variablenames->Add(wxT("o"));
+	variablenames->Add(wxT("p"));
+	variablenames->Add(wxT("r"));
+	variablenames->Add(wxT("s"));
+	variablenames->Add(wxT("t"));
+	variablenames->Add(wxT("u"));
+	variablenames->Add(wxT("v"));
+	variablenames->Add(wxT("y"));
+	variablenames->Add(wxT("z"));
+	
+	numbers = new wxArrayString();
+	numbers->Add(wxT("0"));
+	numbers->Add(wxT("1"));
+	numbers->Add(wxT("2"));
+	numbers->Add(wxT("3"));
+	numbers->Add(wxT("4"));
+	numbers->Add(wxT("5"));
+	numbers->Add(wxT("6"));
+	numbers->Add(wxT("7"));
+	numbers->Add(wxT("8"));
+	numbers->Add(wxT("9"));
 	
 	wxMenuBar *menubar = new wxMenuBar;
 	wxMenu *file = new wxMenu;
@@ -32,9 +66,10 @@ FFT::FFT(const wxString& title)
 	file->Append(ID_MENU_SAVEOUTPUT,wxT("Save output file\tCtrl+S"));
 	file->AppendSeparator();
 	file->Append(wxID_ABOUT,wxT("About\tCtrl+H"));
-	file->Append(wxID_EXIT,wxT("Close"));
+	file->Append(wxID_EXIT,wxT("Close\tCtrl+Q"));
 	menubar->Append(file,wxT("File"));
 	wxMenu *action = new wxMenu;
+	action->Append(ID_MENU_HANDLEINPUT,wxT("Handle Input\tCtrl+I"));
 	action->Append(ID_MENU_RUN,wxT("Run\tCtrl+R"));
 	menubar->Append(action,wxT("Action"));
 	SetMenuBar(menubar);
@@ -122,6 +157,8 @@ FFT::FFT(const wxString& title)
 	Connect(wxID_EXIT,wxEVT_COMMAND_MENU_SELECTED,wxCommandEventHandler(FFT::OnQuit));
 	Connect(ID_MENU_OPENINPUT,wxEVT_COMMAND_MENU_SELECTED,wxCommandEventHandler(FFT::OpenFileForInputMenu));
 	Connect(ID_MENU_SAVEOUTPUT,wxEVT_COMMAND_MENU_SELECTED,wxCommandEventHandler(FFT::SaveOutputAsFileMenu));
+	Connect(ID_MENU_HANDLEINPUT,wxEVT_COMMAND_MENU_SELECTED,wxCommandEventHandler(FFT::HandleInputMenu));
+	Connect(ID_MENU_RUN,wxEVT_COMMAND_MENU_SELECTED,wxCommandEventHandler(FFT::RunMenu));
 	
 	SetIcon(wxIcon(wxT("resource/fft.xpm")));
 	Centre();
@@ -149,6 +186,7 @@ void FFT::OpenFileForInput()
 	{
 		inputtc->LoadFile(newfileforinput->GetPath());
 	}
+	FFT::HandleInput();
 }
 
 void FFT::SaveOutputAsFileMenu(wxCommandEvent& event) {FFT::SaveOutputAsFile();}
@@ -160,4 +198,131 @@ void FFT::SaveOutputAsFile()
 	{
 		outputtc->SaveFile(filesaveas->GetPath());
 	}
+}
+
+void FFT::HandleInputMenu(wxCommandEvent& event) {FFT::HandleInput();}
+
+void FFT::HandleInput()
+{
+	wxString firstlineofinput = inputtc->GetLineText(0);
+	firstlineofinput.Replace(wxT(" "),wxT(";"));
+	wxStringTokenizer variabletkz(firstlineofinput,wxT(";"));
+	int i=0;
+	int space=0;
+	wxString inputvariables;
+	wxString outputvariables;
+	wxString formatfromvars = wxT("(");
+	wxString vartype;
+	while(variabletkz.HasMoreTokens())
+	{
+		wxString variable = variabletkz.GetNextToken();
+		if(variable!=wxT(""))
+		{
+			if(space>0)
+			{
+				if(i==0)
+				{
+					formatfromvars << space+1 << wxT("X,");
+				}
+				else
+				{
+					formatfromvars << wxT(",") << space << wxT("X");
+				}
+				space=0;
+			}
+			int variabletypeint = 0;
+			int variabletypereal = 0;
+			int variabletypechar = 0;
+			for(int k=0;k<variable.Len();k++)
+			{
+				if(numbers->Index(variable.Mid(k,1))!=wxNOT_FOUND)
+				{
+					variabletypeint = 1;
+				}
+				else
+				{
+					if(variable.Mid(k,1)==wxT("."))
+					{
+						variabletypereal = 1;
+					}
+					else
+					{
+						variabletypechar = 1;
+					}
+				}
+			}
+			if(i==0) outputvariables << variablenames->Item(i);
+			if(i>0) outputvariables << wxT(",") << variablenames->Item(i);
+			if(i>0) formatfromvars << wxT(",");
+			if(i==0) inputvariables << variablenames->Item(i);
+			if(i>0) inputvariables << wxT(",") << variablenames->Item(i);
+			if(variabletypechar==1)
+			{
+				inputvariables << wxT("{char(") << variable.Len() << wxT(")}");
+				formatfromvars << wxT("A") << variable.Len();
+			}
+			else
+			{
+				if(variabletypereal==1)
+				{
+					inputvariables << wxT("{real(8)}");
+					formatfromvars << wxT("F") << variable.Len() << wxT(".") << variable.Len()-variable.Find(wxT("."))-1;
+				}
+				else
+				{
+					inputvariables << wxT("{int}");
+					formatfromvars << wxT("I") << variable.Len();
+				}
+			}
+			i++;
+		}
+		else
+		{
+			space++;
+		}
+	}
+	formatfromvars << wxT(")");
+	inputvars->SetValue(inputvariables);
+	outputvars->SetValue(outputvariables);
+	outputformat->SetValue(formatfromvars);
+}
+
+void FFT::RunMenu(wxCommandEvent& event) {FFT::Run();}
+
+void FFT::Run()
+{
+	if(!wxDirExists(wxGetHomeDir()+wxT("/.fft")))
+		wxExecute(wxT("mkdir ")+wxGetHomeDir()+wxT("/.fft"),wxEXEC_SYNC);
+	wxString inputFileForFortran = wxGetHomeDir()+wxT("/.fft/input");
+	inputtc->SaveFile(inputFileForFortran);
+	wxString fftFortranFilePath = wxGetHomeDir()+wxT("/.fft/fft.f95");
+	wxTextFile fftFortranFile(fftFortranFilePath);
+	if(fftFortranFile.Exists())
+	{
+		fftFortranFile.Open();
+	}
+	else
+	{
+		fftFortranFile.Create();
+	}
+	fftFortranFile.Clear();
+	fftFortranFile.AddLine(wxT("program fft"));
+	fftFortranFile.AddLine(wxT("\timplicit none"));
+	fftFortranFile.AddLine(wxT("\tinteger inputrd"));
+	fftFortranFile.AddLine(wxT("\tcharacter(80) :: inputline"));
+	fftFortranFile.AddLine(wxT("\topen(10,file=\"input\")"));
+	fftFortranFile.AddLine(wxT("\topen(20,file=\"output\")"));
+	fftFortranFile.AddLine(wxT("\tdo"));
+	fftFortranFile.AddLine(wxT("\t\tread(10,*,iostat=inputrd) inputline"));
+	fftFortranFile.AddLine(wxT("\t\tif(inputrd.ne.0) exit"));
+	fftFortranFile.AddLine(wxT("\t\twrite(20,*) inputline"));
+	fftFortranFile.AddLine(wxT("\tend do"));
+	fftFortranFile.AddLine(wxT("\tclose(20)"));
+	fftFortranFile.AddLine(wxT("\tclose(10)"));
+	fftFortranFile.AddLine(wxT("end program fft"));
+	fftFortranFile.Write();
+	fftFortranFile.Close();
+	wxExecute(wxT("sh -c \"cd ")+wxGetHomeDir()+wxT("/.fft;")+wxT("gfortran -o fft fft.f95;./fft\""),wxEXEC_SYNC);
+	wxString outputFileFromFortran = wxGetHomeDir()+wxT("/.fft/output");
+	outputtc->LoadFile(outputFileFromFortran);
 }

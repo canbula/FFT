@@ -26,9 +26,12 @@ public:
 	{
 		ID_MENU_OPENINPUT = wxID_HIGHEST + 1,
 		ID_MENU_SAVEOUTPUT,
+		ID_MENU_HANDLEINPUT,
 		ID_MENU_RUN
 	};
 	
+	wxArrayString* variablenames;
+	wxArrayString* numbers;
 	wxTextCtrl* inputvars;
 	wxTextCtrl* outputvars;
 	wxTextCtrl* outputformat;
@@ -41,5 +44,9 @@ public:
 	void OpenFileForInput();
 	void SaveOutputAsFileMenu(wxCommandEvent& event);
 	void SaveOutputAsFile();
+	void HandleInputMenu(wxCommandEvent& event);
+	void HandleInput();
+	void RunMenu(wxCommandEvent& event);
+	void Run();
 
 };
