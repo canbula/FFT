@@ -160,7 +160,7 @@ FFT::FFT(const wxString& title)
 	Connect(ID_MENU_HANDLEINPUT,wxEVT_COMMAND_MENU_SELECTED,wxCommandEventHandler(FFT::HandleInputMenu));
 	Connect(ID_MENU_RUN,wxEVT_COMMAND_MENU_SELECTED,wxCommandEventHandler(FFT::RunMenu));
 	
-	SetIcon(wxIcon(wxT("resource/fft.xpm")));
+	SetIcon(wxIcon(wxT("resource/FFT.xpm")));
 	Centre();
 	
 }
