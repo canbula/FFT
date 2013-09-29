@@ -209,6 +209,8 @@ void FFT::HandleInput()
 	wxStringTokenizer variabletkz(firstlineofinput,wxT(";"));
 	int i=0;
 	int space=0;
+	int currcursor=0;
+	int prevcursor=0;
 	wxString inputvariables;
 	wxString outputvariables;
 	wxString formatfromvars = wxT("(");
@@ -218,6 +220,9 @@ void FFT::HandleInput()
 		wxString variable = variabletkz.GetNextToken();
 		if(variable!=wxT(""))
 		{
+
+			currcursor = firstlineofinput.Find(variable);;
+			space = currcursor - prevcursor;
 			if(space>0)
 			{
 				if(i==0)
@@ -228,8 +233,8 @@ void FFT::HandleInput()
 				{
 					formatfromvars << wxT(",") << space << wxT("X");
 				}
-				space=0;
 			}
+			prevcursor = currcursor+variable.Len();
 			int variabletypeint = 0;
 			int variabletypereal = 0;
 			int variabletypechar = 0;
@@ -275,10 +280,6 @@ void FFT::HandleInput()
 				}
 			}
 			i++;
-		}
-		else
-		{
-			space++;
 		}
 	}
 	formatfromvars << wxT(")");
