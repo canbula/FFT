@@ -335,7 +335,14 @@ void FFT::Run()
 	fftFortranFile.AddLine(wxT("\topen(10,file=\"input\")"));
 	fftFortranFile.AddLine(wxT("\topen(20,file=\"output\")"));
 	fftFortranFile.AddLine(wxT("\tdo"));
-	fftFortranFile.AddLine(wxT("\t\tread(10,\"")+inputformat->GetValue()+wxT("\",iostat=inputrd) ")+inputvarlist);
+	if(inputformat->GetValue()==wxT(""))
+	{
+		fftFortranFile.AddLine(wxT("\t\tread(10,*,iostat=inputrd) ")+inputvarlist);
+	}
+	else
+	{
+		fftFortranFile.AddLine(wxT("\t\tread(10,\"")+inputformat->GetValue()+wxT("\",iostat=inputrd) ")+inputvarlist);
+	}
 	fftFortranFile.AddLine(wxT("\t\tif(inputrd.ne.0) exit"));
 	fftFortranFile.AddLine(wxT("\t\twrite(20,\"")+outputformat->GetValue()+wxT("\") ")+outputvars->GetValue());
 	fftFortranFile.AddLine(wxT("\tend do"));
