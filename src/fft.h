@@ -34,6 +34,7 @@ public:
 	wxArrayString* numbers;
 	wxTextCtrl* inputvars;
 	wxTextCtrl* outputvars;
+	wxTextCtrl* inputformat;
 	wxTextCtrl* outputformat;
 	wxTextCtrl* inputtc;
 	wxTextCtrl* outputtc;

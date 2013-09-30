@@ -100,9 +100,9 @@ FFT::FFT(const wxString& title)
 	
 	wxPanel *top2panel = new wxPanel(mainpanel,-1);
 	wxBoxSizer *top2box = new wxBoxSizer(wxHORIZONTAL);
-	top2box->Add(new wxStaticText(top2panel,-1,wxT("Variables in output "),wxPoint(-1,-1),wxSize(180,-1)),0,wxEXPAND);
-	outputvars = new wxTextCtrl(top2panel,-1,wxT(""));
-	top2box->Add(outputvars,1,wxALIGN_RIGHT);
+	top2box->Add(new wxStaticText(top2panel,-1,wxT("Format of input "),wxPoint(-1,-1),wxSize(180,-1)),0,wxEXPAND);
+	inputformat = new wxTextCtrl(top2panel,-1,wxT(""));
+	top2box->Add(inputformat,1,wxALIGN_RIGHT);
 	top2panel->SetSizer(top2box);
 	mainvbox->Add(top2panel,0,wxALIGN_LEFT|wxEXPAND);
 	
@@ -110,11 +110,21 @@ FFT::FFT(const wxString& title)
 	
 	wxPanel *top3panel = new wxPanel(mainpanel,-1);
 	wxBoxSizer *top3box = new wxBoxSizer(wxHORIZONTAL);
-	top3box->Add(new wxStaticText(top3panel,-1,wxT("Format of output "),wxPoint(-1,-1),wxSize(180,-1)),0,wxEXPAND);
-	outputformat = new wxTextCtrl(top3panel,-1,wxT(""));
-	top3box->Add(outputformat,1,wxALIGN_RIGHT);
+	top3box->Add(new wxStaticText(top3panel,-1,wxT("Variables in output "),wxPoint(-1,-1),wxSize(180,-1)),0,wxEXPAND);
+	outputvars = new wxTextCtrl(top3panel,-1,wxT(""));
+	top3box->Add(outputvars,1,wxALIGN_RIGHT);
 	top3panel->SetSizer(top3box);
 	mainvbox->Add(top3panel,0,wxALIGN_LEFT|wxEXPAND);
+	
+	mainvbox->Add(-1,5);
+	
+	wxPanel *top4panel = new wxPanel(mainpanel,-1);
+	wxBoxSizer *top4box = new wxBoxSizer(wxHORIZONTAL);
+	top4box->Add(new wxStaticText(top4panel,-1,wxT("Format of output "),wxPoint(-1,-1),wxSize(180,-1)),0,wxEXPAND);
+	outputformat = new wxTextCtrl(top4panel,-1,wxT(""));
+	top4box->Add(outputformat,1,wxALIGN_RIGHT);
+	top4panel->SetSizer(top4box);
+	mainvbox->Add(top4panel,0,wxALIGN_LEFT|wxEXPAND);
 	
 	mainvbox->Add(-1,5);
 	
@@ -263,7 +273,7 @@ void FFT::HandleInput()
 			if(i>0) inputvariables << wxT(",") << variablenames->Item(i);
 			if(variabletypechar==1)
 			{
-				inputvariables << wxT("{char(") << variable.Len() << wxT(")}");
+				inputvariables << wxT("{character(") << variable.Len() << wxT(")}");
 				formatfromvars << wxT("A") << variable.Len();
 			}
 			else
@@ -285,6 +295,7 @@ void FFT::HandleInput()
 	formatfromvars << wxT(")");
 	inputvars->SetValue(inputvariables);
 	outputvars->SetValue(outputvariables);
+	inputformat->SetValue(formatfromvars);
 	outputformat->SetValue(formatfromvars);
 }
 
@@ -309,7 +320,7 @@ void FFT::Run()
 	fftFortranFile.Clear();
 	fftFortranFile.AddLine(wxT("program fft"));
 	fftFortranFile.AddLine(wxT("\timplicit none"));
-	fftFortranFile.AddLine(wxT("\tinteger inputrd"));
+	fftFortranFile.AddLine(wxT("\tinteger :: inputrd"));
 	wxStringTokenizer inputvarstkz(inputvars->GetValue(),wxT(","));
 	wxString inputvarlist;
 	int i=0;
@@ -324,7 +335,7 @@ void FFT::Run()
 	fftFortranFile.AddLine(wxT("\topen(10,file=\"input\")"));
 	fftFortranFile.AddLine(wxT("\topen(20,file=\"output\")"));
 	fftFortranFile.AddLine(wxT("\tdo"));
-	fftFortranFile.AddLine(wxT("\t\tread(10,*,iostat=inputrd) ")+inputvarlist);
+	fftFortranFile.AddLine(wxT("\t\tread(10,\"")+inputformat->GetValue()+wxT("\",iostat=inputrd) ")+inputvarlist);
 	fftFortranFile.AddLine(wxT("\t\tif(inputrd.ne.0) exit"));
 	fftFortranFile.AddLine(wxT("\t\twrite(20,\"")+outputformat->GetValue()+wxT("\") ")+outputvars->GetValue());
 	fftFortranFile.AddLine(wxT("\tend do"));
